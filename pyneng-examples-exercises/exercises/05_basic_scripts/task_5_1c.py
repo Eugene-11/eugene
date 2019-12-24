@@ -48,3 +48,14 @@ london_co = {
         'routing': True
     }
 }
+device = input('enter device name:\n')
+d = london_co[device]
+print(d)
+parametrs = input('enter parametr:\n')
+g = london_co.get(parametrs,'Такого параметра нет')
+print(g)
+
+p = london_co[device][parametrs]
+print(p)
+keys = london_co.values()
+print(keys)
