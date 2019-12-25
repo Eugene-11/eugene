@@ -14,3 +14,11 @@
 
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 '''
+
+
+ip = input('enter IP-address in X.X.X.X format:')
+a = ip.split()
+print(a)
+b = list(a)
+print(b)
+print(b[1])
