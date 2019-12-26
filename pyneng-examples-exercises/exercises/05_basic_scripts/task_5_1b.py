@@ -45,3 +45,11 @@ london_co = {
         'routing': True
     }
 }
+device = input('enter device name:\n')
+d = london_co[device]
+print(d)
+v = tuple(list(d.keys()))
+parametrs = input('enter parametr{}:'.format(v))
+p = london_co[device][parametrs]
+print(p)
+

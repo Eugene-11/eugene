@@ -1,0 +1,193 @@
+4.1 Обработать строку nat таким образом,
+чтобы в имени интерфейса вместо FastEthernet было GigabitEthernet.
+
+4.2 Преобразовать строку mac из формата XXXX:XXXX:XXXX в формат XXXX.XXXX.XXXX
+In [2]: mac.replace(':','.')                                                                              
+Out[2]: 'AAAA.BBBB.CCCC'
+
+4.3 Получить из строки config список VLANов вида:
+['1', '3', '10', '20', '30', '100']
+config = 'switchport trunk allowed vlan 1,3,10,20,30,100'
+In [1]: config = 'switchport trunk allowed vlan 1,3,10,20,30,100'                                         
+In [2]: config.split()                                                                                    
+Out[2]: ['switchport', 'trunk', 'allowed', 'vlan', '1,3,10,20,30,100']
+In [10]: vlans = config2[-1].split(',')                                                                   
+In [11]: print(vlans)                                                                                     
+['1', '3', '10', '20', '30', '100']
+
+4.4 Из списка нужно получить уникальный список VLANов,
+отсортированный по возрастанию номеров.
+vlans.set() - сделать множество
+
+4.5 Из строк command1 и command2 получить список VLANов,
+которые есть и в команде command1 и в команде command2.
+Результатом должен быть список: ['1', '3', '8']
+command1 = 'switchport trunk allowed vlan 1,2,3,5,8'
+command2 = 'switchport trunk allowed vlan 1,3,8,9'
+In [1]: command1 = 'switchport trunk allowed vlan 1,2,3,5,8'                                                                            
+In [2]: command2 = 'switchport trunk allowed vlan 1,3,8,9'                                                                              
+In [3]: command11 = command1.split()                                                                                                    
+In [4]: command11                                                                                                                       
+Out[4]: ['switchport', 'trunk', 'allowed', 'vlan', '1,2,3,5,8']
+In [5]: command22 = command2.split()                                                                                                    
+In [6]: command22                                                                                                                       
+Out[6]: ['switchport', 'trunk', 'allowed', 'vlan', '1,3,8,9']
+In [9]: command111 = command11[-1].split(',')                                                                                           
+In [10]: command111                                                                                                                     
+Out[10]: ['1', '2', '3', '5', '8']
+In [11]: command222 = command22[-1].split(',')                                                                                          
+In [12]: command222                                                                                                                     
+Out[12]: ['1', '3', '8', '9']
+In [20]: vlans1 = set(command111)
+In [22]: vlans2 = set(command222)
+In [24]: vlans1.intersection(vlans2)                                                                                                    
+Out[24]: {'1', '3', '8'}
+
+4.6 Обработать строку ospf_route и вывести информацию на стандартный поток вывода в виде:
+Protocol:              OSPF
+Prefix:                10.0.24.0/24
+AD/Metric:             110/41
+Next-Hop:              10.0.13.3
+Last update:           3d18h
+Outbound Interface:    FastEthernet0/0
+
+ospf_route = 'O        10.0.24.0/24 [110/41] via 10.0.13.3, 3d18h, FastEthernet0/0'
+route = """ 
+   ...: Protocol: OSPF 
+   ...: Prefix: 10.0.24.0/24 
+   ...: AD/Metric: 110/41 
+   ...: Next-Hop: 10.0.13.3 
+   ...: """             
+
+4.7 Преобразовать MAC-адрес mac в двоичную строку такого вида:
+'101010101010101010111011101110111100110011001100'
+mac = 'AAAA:BBBB:CCCC'
+In [10]: mac2 = mac.replace(':','')                                                                                                     
+
+In [11]: mac2                                                                                                                           
+Out[11]: '01F212D4A34B'
+In [14]: bin(int(mac2, 16))                                                                                                             
+Out[14]: '0b11111001000010010110101001010001101001011'
+
+4.8
+Преобразовать IP-адрес в двоичный формат и вывести на стандартный поток вывода вывод столбцами, таким образом:
+- первой строкой должны идти десятичные значения байтов
+- второй строкой двоичные значения
+
+Вывод должен быть упорядочен также, как в примере:
+- столбцами
+- ширина столбца 10 символов
+
+Пример вывода для адреса 10.1.1.1:
+10        1         1         1
+00001010  00000001  00000001  00000001
+ip = '192.168.3.1'
+
+ip = '''  
+    ...: {0:<10} {1:<10} {2:<10} {3:<10}  
+    ...: {0:<08b}   {1:<08b}   {2:<08b}   {3:<08b}'''     
+print(ip.format(192, 168, 3, 1))
+
+
+5.1 Необходимо запросить у пользователя ввод имени устройства (r1, r2 или sw1).
+И вывести информацию о соответствующем устройстве на стандартный поток вывода
+(информация будет в виде словаря).
+
+
+Пример выполнения скрипта:
+$ python task_5_1.py
+Введите имя устройства: r1
+{'location': '21 New Globe Walk', 'vendor': 'Cisco', 'model': '4451', 'ios': '15.4', 'ip': '10.255.0.1'}
+
+device = input('enter device name\n')
+print(london_co[device])
+
+5.1а Переделать скрипт из задания 5.1 таким образом, чтобы,
+кроме имени устройства, запрашивался также параметр устройства, который нужно отобразить.
+evice = input('enter device name: ')
+parametr = input('enter parametr: ')
+print(london_co[device][parametr])
+
+5.1b Переделать скрипт из задания 5.1a таким образом, чтобы, при запросе параметра,
+отображался список возможных параметров. Список параметров надо получить из словаря,
+а не прописывать вручную.
+
+Вывести информацию о соответствующем параметре, указанного устройства.
+
+Пример выполнения скрипта:
+$ python task_5_1b.py
+Введите имя устройства: r1
+Введите имя параметра (ios, model, vendor, location, ip): ip
+10.255.0.1
+
+device = input('enter device name:\n')
+d = london_co[device]
+v = tuple(list(d.keys()))
+parametrs = input('enter parametr{}:'.format(v))
+p = london_co[device][parametrs]
+print(p)
+
+
+5.1с Переделать скрипт из задания 5.1b таким образом, чтобы, при запросе параметра,
+которого нет в словаре устройства, отображалось сообщение 'Такого параметра нет'.
+Пример выполнения скрипта:
+$ python task_5_1c.py
+Введите имя устройства: r1
+Введите имя параметра (ios, model, vendor, location, ip): ips
+Такого параметра нет
+
+device = input('enter device name:\n')
+d = london_co[device]
+print(d)
+parametrs = input('enter parametr:\n')
+g = london_co.get(parametrs,'Такого параметра нет')
+print(g)
+
+p = london_co[device][parametrs]
+print(p)
+
+tuple_keys = tuple(london_co.values())
+parametr = input(london_co.values())
+
+
+5.1 d Переделать скрипт из задания 5.1c таким образом, чтобы, при запросе параметра,
+пользователь мог вводить название параметра в любом регистре.
+
+Пример выполнения скрипта:
+$ python task_5_1d.py
+Введите имя устройства: r1
+Введите имя параметра (ios, model, vendor, location, ip): IOS
+15.4
+
+device = input('enter device name:')
+d = london_co[device]
+v = tuple(list(d.keys()))
+parametrs = input('enter parametr{}:'.format(v))
+par = parametrs.lower()
+print(london_co[device][par])
+
+6.1 Список mac содержит MAC-адреса в формате XXXX:XXXX:XXXX.
+Однако, в оборудовании cisco MAC-адреса используются в формате XXXX.XXXX.XXXX.
+Создать скрипт, который преобразует MAC-адреса в формат cisco
+и добавляет их в новый список mac_cisco
+
+mac = ['aabb:cc80:7000', 'aabb:dd80:7340', 'aabb:ee80:7000', 'aabb:ff80:7000']
+mac_cisco  = []
+for i in mac:
+    mac_cisco.append(i.replace(':','.'))
+print(mac_cisco)
+
+b = input()
+lst = list(b)
+print(lst)
+lst.remove('/')
+print(lst)
+
+ip, mask = ['10.1.1.1', '24']
+a = '{}/{}'.format(ip, mask)
+print(a)
+                             
+
+
+
+
