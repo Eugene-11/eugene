@@ -13,3 +13,11 @@
 '''
 
 ignore = ['duplex', 'alias', 'Current configuration']
+from sys import argv
+with open (argv[1], 'r') as f:
+    for line in f:
+        if line.startswith('!') or line.find(ignore[0]) is not -1 or line.find(ignore[1]) is not -1 or line.find(ignore[2]) is not -1:
+            continue
+        else:
+            print(line.strip())
+
