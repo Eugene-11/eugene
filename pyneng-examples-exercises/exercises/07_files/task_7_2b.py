@@ -14,3 +14,12 @@
 '''
 
 ignore = ['duplex', 'alias', 'Current configuration']
+from sys import argv
+g = open('config_sw1_cleared.txt', 'w')
+with open (argv[1], 'r') as f:
+    for line in f:
+        if line.find(ignore[0]) is not -1 or line.find(ignore[1]) is not -1 or line.find(ignore[2]) is not -1:
+            continue
+        else: 
+            with open ('config_sw1_cleared.txt', 'a') as h:
+                h.write(line)

@@ -52,12 +52,16 @@ Last update:           3d18h
 Outbound Interface:    FastEthernet0/0
 
 ospf_route = 'O        10.0.24.0/24 [110/41] via 10.0.13.3, 3d18h, FastEthernet0/0'
-route = """ 
-   ...: Protocol: OSPF 
-   ...: Prefix: 10.0.24.0/24 
-   ...: AD/Metric: 110/41 
-   ...: Next-Hop: 10.0.13.3 
-   ...: """             
+a = ospf_route.replace(',','').split()
+b = a.remove('via') 
+print (f""" 
+       ...: Protocol: {a[0].replace('O', 'OSPF')}
+       ...: Prefix: {a[1]} 
+       ...: AD/Metric: {a[2].strip('[]')} 
+       ...: Next-Hop: {a[3]}
+       ...: Last update: {a[4]}
+       ...: Outbound interface: {a[5]} """)
+           
 
 4.7 Преобразовать MAC-адрес mac в двоичную строку такого вида:
 '101010101010101010111011101110111100110011001100'
@@ -104,7 +108,7 @@ print(london_co[device])
 
 5.1а Переделать скрипт из задания 5.1 таким образом, чтобы,
 кроме имени устройства, запрашивался также параметр устройства, который нужно отобразить.
-evice = input('enter device name: ')
+device = input('enter device name: ')
 parametr = input('enter parametr: ')
 print(london_co[device][parametr])
 
@@ -166,6 +170,138 @@ parametrs = input('enter parametr{}:'.format(v))
 par = parametrs.lower()
 print(london_co[device][par])
 
+5.2 Запросить у пользователя ввод IP-сети в формате: 10.1.1.0/24
+
+Затем вывести информацию о сети и маске в таком формате:
+
+Network:
+10        1         1         0
+00001010  00000001  00000001  00000000
+
+Mask:
+/24
+255       255       255       0
+11111111  11111111  11111111  00000000
+
+ip_mask = input('Enter IP/mask, plese:')
+ip_mask_1 = ip_mask.replace('.', ' ')
+old_list = ip_mask_1.split('/')  #devide ip from mask
+ip = old_list[0].split()         #take ip and devide to separate numbers
+mask = int(old_list[1])
+d0, d1, d2, d3 = list(map(int, ip)) #convert str list to num list
+m = '1'*mask + '0'*(32-mask)
+oct1 = m[0:8]
+oct2 = m[8:16]
+oct3 = m[16:24]
+oct4 = m[24:32]
+octet1 = (int(oct1[0])*2**7 + int(oct1[1])*2**6 + int(oct1[2])*2**5+ int(oct1[3])*2**4 + int(oct1[4])*2**3 + int(oct1[5])*2**2 + int(oct1[6])*2**1 + int(oct1[7])*2**0)
+octet2 = (int(oct2[0])*2**7 + int(oct2[1])*2**6 + int(oct2[2])*2**5+ int(oct2[3])*2**4 + int(oct2[4])*2**3 + int(oct2[5])*2**2 + int(oct2[6])*2**1 + int(oct2[7])*2**0)
+octet3 = (int(oct3[0])*2**7 + int(oct3[1])*2**6 + int(oct3[2])*2**5+ int(oct3[3])*2**4 + int(oct3[4])*2**3 + int(oct3[5])*2**2 + int(oct3[6])*2**1 + int(oct3[7])*2**0)
+octet4 = (int(oct4[0])*2**7 + int(oct4[1])*2**6 + int(oct4[2])*2**5+ int(oct4[3])*2**4 + int(oct4[4])*2**3 + int(oct4[5])*2**2 + int(oct4[6])*2**1 + int(oct4[7])*2**0)
+print(f'''
+    ...: Network:
+    ...: {d0:<10} {d1:<10} {d2:<10} {d3:<10}  
+    ...: {d0:08b}   {d1:08b}   {d2:08b}   {d3:08b}
+    ...: Mask:
+    ...: /{mask}
+    ...: {octet1:<10} {octet2:<10} {octet3:<10} {octet4:<10}  
+    ...: {octet1:08b}   {octet2:08b}   {octet3:08b}   {octet4:08b}''')
+
+5.2а Всё, как в задании 5.2, но, если пользователь ввел адрес хоста, а не адрес сети,
+надо преобразовать адрес хоста в адрес сети и вывести адрес сети и маску, как в задании 5.2.
+Пример адреса сети (все биты хостовой части равны нулю):
+* 10.0.1.0/24
+* 190.1.0.0/16
+Пример адреса хоста:
+* 10.0.1.1/24 - хост из сети 10.0.1.0/24
+* 10.0.5.1/30 - хост из сети 10.0.5.0/30
+Если пользователь ввел адрес 10.0.1.1/24,
+вывод должен быть таким:
+Network: 
+10        0         1         0
+00001010  00000000  00000001  00000000   
+Mask:
+/24 
+255       255       255       0
+11111111  11111111  11111111  00000000
+
+Задание 5.2b
+
+Преобразовать скрипт из задания 5.2a (СДЕЛАЛ ДЛЯ 5.2) таким образом,
+чтобы сеть/маска не запрашивались у пользователя,
+а передавались как аргумент скрипту.
+
+from sys import argv
+ip_mask = argv[1]
+old_list = ip_mask.split('/')
+ip = old_list[0].split('.')         
+mask = int(old_list[1])
+d0, d1, d2, d3 = list(map(int, ip)) 
+m = '1'*mask + '0'*(32-mask)
+print(m)
+oct1 = m[0:8]
+oct2 = m[8:16]
+oct3 = m[16:24]
+oct4 = m[24:32]
+octet1 = (int(oct1[0])*2**7 + int(oct1[1])*2**6 + int(oct1[2])*2**5+ int(oct1[3])*2**4 + int(oct1[4])*2**3 + int(oct1[5])*2**2 + int(oct1[6])*2**1 + int(oct1[7])*2**0)
+octet2 = (int(oct2[0])*2**7 + int(oct2[1])*2**6 + int(oct2[2])*2**5+ int(oct2[3])*2**4 + int(oct2[4])*2**3 + int(oct2[5])*2**2 + int(oct2[6])*2**1 + int(oct2[7])*2**0)
+octet3 = (int(oct3[0])*2**7 + int(oct3[1])*2**6 + int(oct3[2])*2**5+ int(oct3[3])*2**4 + int(oct3[4])*2**3 + int(oct3[5])*2**2 + int(oct3[6])*2**1 + int(oct3[7])*2**0)
+octet4 = (int(oct4[0])*2**7 + int(oct4[1])*2**6 + int(oct4[2])*2**5+ int(oct4[3])*2**4 + int(oct4[4])*2**3 + int(oct4[5])*2**2 + int(oct4[6])*2**1 + int(oct4[7])*2**0)
+print(f'''
+          ...: Network:
+          ...: {d0:<10} {d1:<10} {d2:<10} {d3:<10}  
+          ...: {d0:08b}   {d1:08b}   {d2:08b}   {d3:08b}
+          ...: Mask:
+          ...: /{mask}
+          ...: {octet1:<10} {octet2:<10} {octet3:<10} {octet4:<10}  
+          ...: {octet1:08b}   {octet2:08b}   {octet3:08b}   {octet4:08b}'''
+
+Задание 5.3
+
+Скрипт должен запрашивать у пользователя:
+* информацию о режиме интерфейса (access/trunk)
+* номере интерфейса (тип и номер, вида Gi0/3)
+* номер VLANа (для режима trunk будет вводиться список VLANов)
+
+В зависимости от выбранного режима, на стандартный поток вывода,
+должна возвращаться соответствующая конфигурация access или trunk
+(шаблоны команд находятся в списках access_template и trunk_template).
+
+При этом, сначала должна идти строка interface и подставлен номер интерфейса,
+а затем соответствующий шаблон, в который подставлен номер VLANа (или список VLANов).
+
+Ограничение: Все задания надо выполнять используя только пройденные темы.
+То есть эту задачу можно решить без использования условия if и циклов for/while.
+
+Ниже примеры выполнения скрипта, чтобы было проще понять задачу.
+
+Пример выполнения скрипта, при выборе режима access:
+
+$ python task_5_3.py
+Введите режим работы интерфейса (access/trunk): access
+Введите тип и номер интерфейса: Fa0/6
+interface Fa0/6
+switchport mode access
+switchport access vlan 3
+switchport nonegotiate
+spanning-tree portfast
+spanning-tree bpduguard enable
+
+Пример выполнения скрипта, при выборе режима trunk:
+$ python task_5_3.py
+Введите режим работы интерфейса (access/trunk): trunk
+Введите тип и номер интерфейса: Fa0/7
+Введите номер влан(ов): 2,3,4,5
+
+interface Fa0/7
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 2,3,4,5
+'''
+
+
+
+
 6.1 Список mac содержит MAC-адреса в формате XXXX:XXXX:XXXX.
 Однако, в оборудовании cisco MAC-адреса используются в формате XXXX.XXXX.XXXX.
 Создать скрипт, который преобразует MAC-адреса в формат cisco
@@ -177,16 +313,219 @@ for i in mac:
     mac_cisco.append(i.replace(':','.'))
 print(mac_cisco)
 
-b = input()
-lst = list(b)
-print(lst)
-lst.remove('/')
-print(lst)
+6.2
+1. Запросить у пользователя ввод IP-адреса в формате 10.0.1.1
+2. Определить тип IP-адреса.
+3. В зависимости от типа адреса, вывести на стандартный поток вывода:
+   'unicast' - если первый байт в диапазоне 1-223
+   'multicast' - если первый байт в диапазоне 224-239
+   'local broadcast' - если IP-адрес равен 255.255.255.255
+   'unassigned' - если IP-адрес равен 0.0.0.0
+   'unused' - во всех остальных случаях
 
-ip, mask = ['10.1.1.1', '24']
-a = '{}/{}'.format(ip, mask)
-print(a)
-                             
+
+ip = input('Enter IP, please, in 10.0.1.1 format:')
+ip1 = ip.split('.')
+d0, d1, d2, d3 = list(map(int, ip1))
+if 0<d0<224:
+        print("unicast")
+elif 223<d0<=239: 
+        print('multicast')
+elif d0==d1==d2==d3==255:
+        print('local broadcast')
+elif d0==d1==d2==d3==0:
+        print('unassigned')
+else:
+        print("unused")
+
+
+6.2a
+Сделать копию скрипта задания 6.2.
+
+Добавить проверку введенного IP-адреса. Адрес считается корректно заданным, если он:
+   - состоит из 4 чисел разделенных точкой,
+   - каждое число в диапазоне от 0 до 255.
+
+Если адрес задан неправильно, выводить сообщение:
+'Неправильный IP-адрес'
+
+ip = input('Enter IP in 10.0.1.1 format:\n')
+dot = ip.count('.')
+ip2 = ip.split('.') 
+if dot == 3:
+        for i in ip2:
+            if i.isdigit() and 0<=int(i)<=255:
+                pass
+            else:
+                print('Неправильный IP-адрес')
+                break 
+        else:
+            if 0<int(ip2[0])<224:
+                print("unicast")
+            elif 223<int(ip2[0])<=239:
+                print('multicast')
+            elif int(ip2[0])==int(ip2[1])==int(ip2[2])==int(ip2[3])==255:
+                print('local broadcast')
+            elif int(ip2[0])==int(ip2[1])==int(ip2[2])==int(ip2[3])==0:
+                print('unassigned')
+            else:
+                print("unused")
+else:
+    print('Неправильный IP-адрес')
+
+
+Задание 6.2b
+
+Сделать копию скрипта задания 6.2a.
+
+Дополнить скрипт:
+Если адрес был введен неправильно, запросить адрес снова.
+
+IP_correct = False
+ip = input('Enter IP, please, in 10.0.1.1 format:\n')
+while not IP_correct:
+    dot = ip.count('.')
+    ip2 = ip.split('.')
+    if dot == 3:
+        for i in ip2:
+            if i.isdigit() and 0<=int(i)<=255:
+                pass
+            else:
+                print('Неправильный IP-адрес')
+                ip = input('Enter IP again, please:\n')
+                break
+        else:
+            if 0<int(ip2[0])<224:
+                print("unicast")
+            elif 223<int(ip2[0])<=239:
+                print('multicast')
+            elif int(ip2[0])==int(ip2[1])==int(ip2[2])==int(ip2[3])==255:
+                print('local broadcast')
+            elif int(ip2[0])==int(ip2[1])==int(ip2[2])==int(ip2[3])==0:
+                print('unassigned')
+            else:
+                print("unused")
+            IP_correct = True
+    else:
+        print('Неправильный IP-адрес')
+        ip = input('Enter IP again, please:\n')
+
+Задание 6.3
+
+В скрипте сделан генератор конфигурации для access-портов.
+
+Сделать аналогичный генератор конфигурации для портов trunk.
+
+В транках ситуация усложняется тем, что VLANов может быть много, и надо понимать,
+что с ним делать.
+
+Поэтому в соответствии каждому порту стоит список
+и первый (нулевой) элемент списка указывает как воспринимать номера VLAN,
+которые идут дальше:
+	add - VLANы надо будет добавить (команда switchport trunk allowed vlan add 10,20)
+	del - VLANы надо удалить из списка разрешенных (команда switchport trunk allowed vlan remove 17)
+	only - на интерфейсе должны остаться разрешенными только указанные VLANы (команда switchport trunk allowed vlan 11,30)
+
+Задача для портов 0/1, 0/2, 0/4:
+- сгенерировать конфигурацию на основе шаблона trunk_template
+- с учетом ключевых слов add, del, only
+
+Код не должен привязываться к конкретным номерам портов. То есть, если в словаре
+trunk будут другие номера интерфейсов, код должен работать.
+
+for intf, vlan in trunk.items():
+    print('interface FastEthernet' + intf)
+    for command in trunk_template:
+        if command.endswith('allowed vlan'):
+            print(' {} {}'.format(command, ' '.join(vlan)))
+        else:
+            print(' {}'.format(command))
+
+Задание 7.1
+
+Аналогично заданию 4.6 обработать строки из файла ospf.txt
+и вывести информацию по каждой в таком виде:
+Protocol:              OSPF
+Prefix:                10.0.24.0/24
+AD/Metric:             110/41
+Next-Hop:              10.0.13.3
+Last update:           3d18h
+Outbound Interface:    FastEthernet0/0
+
+Ограничение: Все задания надо выполнять используя только пройденные темы.
+
+'''
+with open('ospf.txt', 'r') as f:
+    for line in f:
+        a = line.replace(',','').split()
+        b = a.remove('via') 
+        print (f"""              ...: Protocol: {a[0].replace('O', 'OSPF')}
+              ...: Prefix: {a[1]} 
+              ...: AD/Metric: {a[2].strip('[]')} 
+              ...: Next-Hop: {a[3]}
+              ...: Last update: {a[4]}
+              ...: Outbound interface: {a[5]}
+               """)
+Задание 7.2
+
+Создать скрипт, который будет обрабатывать конфигурационный файл config_sw1.txt:
+- имя файла передается как аргумент скрипту
+
+Скрипт должен возвращать на стандартный поток вывода команды из переданного
+конфигурационного файла, исключая строки, которые начинаются с '!'.
+
+Между строками не должно быть дополнительного символа перевода строки.
+
+from sys import argv
+with open (argv[1], 'r') as f:
+    for line in f:
+        if line.startswith('!'):
+            continue
+        else:
+            print(line.strip())
+
+
+Задание 7.2a
+
+Сделать копию скрипта задания 7.2.
+
+Дополнить скрипт:
+  Скрипт не должен выводить команды, в которых содержатся слова,
+  которые указаны в списке ignore.
+ignore = ['duplex', 'alias', 'Current configuration']
+from sys import argv
+with open (argv[1], 'r') as f:
+    for line in f:
+        if line.startswith('!') or line.find(ignore[0]) is not -1 or line.find(ignore[1]) is not -1 or line.find(ignore[2]) is not -1:
+            continue
+        else: 
+            print(line.strip())
+
+Задание 7.2b
+
+Дополнить скрипт из задания 7.2a:
+* вместо вывода на стандартный поток вывода,
+  скрипт должен записать полученные строки в файл config_sw1_cleared.txt
+
+При этом, должны быть отфильтрованы строки, которые содержатся в списке ignore.
+Строки, которые начинаются на '!' отфильтровывать не нужно.
+
+ignore = ['duplex', 'alias', 'Current configuration']
+from sys import argv
+g = open('config_sw1_cleared.txt', 'w')
+with open (argv[1], 'r') as f:
+    for line in f:
+        if line.find(ignore[0]) is not -1 or line.find(ignore[1]) is not -1 or line.find(ignore[2]) is not -1:
+            continue
+        else: 
+            with open ('config_sw1_cleared.txt', 'a') as h:
+                h.write(line)
+
+
+
+
+
+
 
 
 

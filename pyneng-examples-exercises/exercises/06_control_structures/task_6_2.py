@@ -14,11 +14,16 @@
 
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 '''
-
-
-ip = input('enter IP-address in X.X.X.X format:')
-a = ip.split()
-print(a)
-b = list(a)
-print(b)
-print(b[1])
+ip = input('Enter IP, please, in 10.0.1.1 format:')
+ip1 = ip.split('.')
+d0, d1, d2, d3 = list(map(int, ip1))
+if 0<d0<224:
+        print("unicast")
+elif 223<d0<=239:
+        print('multicast')
+elif d0==d1==d2==d3==255:
+        print('local broadcast')
+elif d0==d1==d2==d3==0:
+        print('unassigned')
+else:
+        print("unused")
