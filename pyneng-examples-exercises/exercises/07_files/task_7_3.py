@@ -17,3 +17,9 @@
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 
 '''
+with open ('CAM_table.txt', 'r') as f:
+    for line in f:
+        if line.count('.') == 2:
+            b = line.strip('\n').split()
+            print(b[0]+'   '+b[1]+'   '+b[3])
+
